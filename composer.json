@@ -1,0 +1,17 @@
+{
+  "name": "saitamasama/memeserver",
+  "description": "A webserver which can be used to serve memes better (I dunno if it can be)",
+  "version": "0.0.1-alpha",
+  "keywords": ["webserver", "php-server", "meme"],
+  "authors": [{
+    "name": "Gourab Nag",
+    "email": "saitama@room11.org",
+    "homepage": "http://gourab.me",
+    "role": "meme developer"
+  }],
+  "autoload": {
+    "psr-0": {
+      "memeserver\\": "lib/"
+    }
+  }
+}
