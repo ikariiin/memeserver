@@ -15,5 +15,5 @@ namespace memeserver\Handler;
 interface Handler {
     public function __construct(RawPayload $payload);
 
-    public function process(callable $callback);
+    public function setCallback(callable $callback);
 }

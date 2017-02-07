@@ -10,7 +10,7 @@
     "role": "meme developer"
   }],
   "autoload": {
-    "psr-0": {
+    "psr-4": {
       "memeserver\\": "lib/"
     }
   }

@@ -49,6 +49,12 @@ class Settings {
     private $logLevel;
 
     /**
+     * Whether to log errors to console
+     * @var bool
+     */
+    private $logToConsole;
+
+    /**
      * @return string
      */
     public function getListeningIp(): string {
@@ -126,5 +132,21 @@ class Settings {
     public function setLogLevel(int $logLevel): self {
         $this->logLevel = $logLevel;
         return $this;
+    }
+
+    /**
+     * @param bool $logToConsole
+     * @return Settings
+     */
+    public function setLogToConsole(bool $logToConsole): Settings {
+        $this->logToConsole = $logToConsole;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLogToConsole(): bool {
+        return $this->logToConsole;
     }
 }
