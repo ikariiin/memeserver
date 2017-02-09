@@ -9,6 +9,9 @@
 namespace memeserver\Core;
 
 
+use memeserver\Core\Logging\BasicError;
+use memeserver\Core\Logging\Logger;
+use memeserver\Core\StreamSocket\ThreadSafeStream;
 use memeserver\Handler\Handler;
 
 class Listener {
@@ -31,12 +34,39 @@ class Listener {
      */
     private $handler;
 
-    public function __construct(Settings $settings) {
+    /**
+     * The parent stream
+     * @var ThreadSafeStream
+     */
+    private $activeParentStream;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(Settings $settings, Logger $logger) {
         $this->ip = $settings->getListeningIp();
         $this->port = $settings->getListeningPort();
         $this->handler = $settings->getHandler();
+        $this->logger = $logger;
     }
 
-    public function listen() {
+    public function initListening() {
+        $this->activeParentStream = (new ThreadSafeStream($this->logger))
+            ->createServer(sprintf("%s://%s:%s",
+                "tcp",
+                $this->ip,
+                $this->port
+            ));
+
+        if($this->activeParentStream instanceof BasicError) {
+            $this->activeParentStream->log();
+            Logger::notifyFatal();
+            ProgramHandler::exit();
+            exit;
+        }
+
+        return $this->activeParentStream;
     }
 }

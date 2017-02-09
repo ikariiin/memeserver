@@ -9,5 +9,10 @@
 namespace memeserver\Core;
 
 
+use memeserver\Core\StreamSocket\ThreadSafeStream;
+
 class Watcher {
+    public function __construct(ThreadSafeStream $stream) {
+        $this->activeParentStream = $stream;
+    }
 }

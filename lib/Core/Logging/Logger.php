@@ -8,6 +8,8 @@
 
 namespace memeserver\Core\Logging;
 
+use memeserver\Core\IO\Console\Console;
+
 /**
  * Class Logger
  * The object would be retained across
@@ -21,5 +23,11 @@ class Logger {
         $this->logMode = $logMode;
     }
 
-    public function exceptionHandler(\Throwable $throwable) {}
+    public static function notifyFatal(): void {
+        Console::out("Fatal Error. Exiting.");
+    }
+
+    public function exceptionHandler(\Throwable $throwable) {
+        var_dump($throwable);
+    }
 }

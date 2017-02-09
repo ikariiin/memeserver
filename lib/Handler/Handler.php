@@ -8,6 +8,8 @@
 
 namespace memeserver\Handler;
 
+use memeserver\Core\Payloads\RawPayload;
+
 /**
  * Interface Handler
  * @package memeserver\Handler

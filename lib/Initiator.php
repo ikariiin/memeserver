@@ -26,6 +26,8 @@ class Initiator {
 
     public function __construct(Settings $settings) {
         $this->settings = clone $settings;
+
+        $this->logger = $this->getLogger();
     }
 
     /**
@@ -42,6 +44,6 @@ class Initiator {
     }
 
     public function getListener() {
-        return (new Listener($this->settings));
+        return (new Listener($this->settings, $this->logger));
     }
 }
