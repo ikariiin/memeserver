@@ -33,9 +33,12 @@ class ThreadSafeStream extends \Threaded {
 
     /**
      * @param $stream
+     * @return $this
      */
     public function createFromExistingStream($stream) {
         $this->stream = $stream;
+
+        return $this;
     }
 
     /**
@@ -50,5 +53,22 @@ class ThreadSafeStream extends \Threaded {
         else
             return $this;
 
+    }
+
+    /**
+     * @return bool|self
+     */
+    public function accept() {
+        $acceptedStream = stream_socket_accept($this->stream);
+        if($acceptedStream != false) {
+            return (new ThreadSafeStream($this->logger))
+                ->createFromExistingStream($acceptedStream);
+        } else {
+            return false;
+        }
+    }
+
+    public function read(int $size) {
+        return fread($this->stream, $size);
     }
 }

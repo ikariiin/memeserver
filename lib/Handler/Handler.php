@@ -15,7 +15,13 @@ use memeserver\Core\Payloads\RawPayload;
  * @package memeserver\Handler
  */
 interface Handler {
-    public function __construct(RawPayload $payload);
+    /**
+     * @param RawPayload $payload
+     */
+    public function setRawPayload(RawPayload $payload);
 
+    /**
+     * @param callable $callback
+     */
     public function setCallback(callable $callback);
 }

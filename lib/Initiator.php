@@ -43,6 +43,9 @@ class Initiator {
         ));
     }
 
+    /**
+     * @return Listener
+     */
     public function getListener() {
         return (new Listener($this->settings, $this->logger));
     }

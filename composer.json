@@ -13,5 +13,8 @@
     "psr-4": {
       "memeserver\\": "lib/"
     }
+  },
+  "require": {
+    "doctrine/annotations": "^1.3"
   }
 }

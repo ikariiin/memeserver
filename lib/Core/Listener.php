@@ -45,13 +45,27 @@ class Listener {
      */
     private $logger;
 
+    /**
+     * @var Settings
+     */
+    private $settings;
+
+    /**
+     * Listener constructor.
+     * @param Settings $settings
+     * @param Logger $logger
+     */
     public function __construct(Settings $settings, Logger $logger) {
+        $this->settings = $settings;
         $this->ip = $settings->getListeningIp();
         $this->port = $settings->getListeningPort();
         $this->handler = $settings->getHandler();
         $this->logger = $logger;
     }
 
+    /**
+     * @return BasicError|ThreadSafeStream
+     */
     public function initListening() {
         $this->activeParentStream = (new ThreadSafeStream($this->logger))
             ->createServer(sprintf("%s://%s:%s",
@@ -68,5 +82,9 @@ class Listener {
         }
 
         return $this->activeParentStream;
+    }
+
+    public function getWatcher() {
+        return new Watcher($this->settings, $this->activeParentStream, $this->logger);
     }
 }

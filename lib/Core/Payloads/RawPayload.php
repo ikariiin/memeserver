@@ -9,7 +9,24 @@
 namespace memeserver\Core\Payloads;
 
 
-class RawPayload
-{
+class RawPayload {
+    /**
+     * @var string
+     */
+    private $payload;
 
+    /**
+     * RawPayload constructor.
+     * @param string $payload
+     */
+    public function __construct(string $payload) {
+        $this->payload = $payload;
+    }
+
+    /**
+     * @return string
+     */
+    public function get() {
+        return $this->payload;
+    }
 }

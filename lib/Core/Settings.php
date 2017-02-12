@@ -8,6 +8,7 @@
 
 namespace memeserver\Core;
 
+use memeserver\Core\Router\Router;
 use memeserver\Handler\Handler;
 
 /**
@@ -34,6 +35,12 @@ class Settings {
      * @var Handler
      */
     private $handler;
+
+    /**
+     * The router may/may not be used by the handler
+     * @var Router
+     */
+    private $router;
 
     /**
      * The directory to store logs.
@@ -148,5 +155,21 @@ class Settings {
      */
     public function isLogToConsole(): bool {
         return $this->logToConsole;
+    }
+
+    /**
+     * @param Router $router
+     * @return Settings
+     */
+    public function setRouter(Router $router): Settings {
+        $this->router = $router;
+        return $this;
+    }
+
+    /**
+     * @return Router
+     */
+    public function getRouter(): Router {
+        return $this->router;
     }
 }
