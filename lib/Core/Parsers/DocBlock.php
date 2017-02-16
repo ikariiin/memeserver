@@ -9,12 +9,19 @@
 namespace memeserver\Core\Parsers;
 
 
+use memeserver\Core\DataStructures\KeyValuePairs;
+
 class DocBlock {
-    public function parse($class, string $method) {
+    /**
+     * @param $class
+     * @param string $method
+     * @return KeyValuePairs
+     */
+    public function parse($class, string $method): KeyValuePairs {
         $reflection = new \ReflectionMethod($class, $method);
         $docBlock = $reflection->getDocComment();
 
-        $pairs = [];
+        $pairs = new KeyValuePairs();
 
         $lines = explode(PHP_EOL, $docBlock);
         // We do not require the `/**` and `*/`
@@ -30,7 +37,7 @@ class DocBlock {
             if($line[0] == '@') {
                 $keyValue = explode('=', substr($line, 1));
                 if(count($keyValue) == 2) {
-                    $pairs[$keyValue[0]] = $keyValue[1];
+                    $pairs->create($keyValue[0], $keyValue[1]);
                 }
             }
         }

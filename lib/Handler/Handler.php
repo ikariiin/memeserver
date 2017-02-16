@@ -9,6 +9,7 @@
 namespace memeserver\Handler;
 
 use memeserver\Core\Payloads\RawPayload;
+use memeserver\Core\StreamSocket\ThreadSafeStream;
 
 /**
  * Interface Handler
@@ -24,4 +25,9 @@ interface Handler {
      * @param callable $callback
      */
     public function setCallback(callable $callback);
+
+    /**
+     * @param ThreadSafeStream $stream
+     */
+    public function setStream(ThreadSafeStream $stream);
 }

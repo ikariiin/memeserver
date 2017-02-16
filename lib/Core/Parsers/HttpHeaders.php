@@ -9,6 +9,8 @@
 namespace memeserver\Core\Parsers;
 
 
+use memeserver\Core\DataStructures\HttpHeader;
+use memeserver\Core\DataStructures\KeyValuePairs;
 use memeserver\Core\Payloads\RawPayload;
 
 /**
@@ -29,14 +31,42 @@ class HttpHeaders implements Parser {
         $this->payload = $payload;
     }
 
-    public function parse() {
+    /**
+     * @return HttpHeader
+     */
+    public function parse(): HttpHeader {
         $rawText =  $this->payload->get();
-        $line = $this->linize($rawText);
+        $lines = $this->linize($rawText);
+        $kVPairs = $this->getKeyValuePairs($lines);
+        return new HttpHeader($kVPairs);
     }
 
-    private function linize(string $rawText, string $delimiter = PHP_EOL): array {
+    /**
+     * @param string $rawText
+     * @param string $delimiter
+     * @return array
+     */
+    private function linize(string $rawText, string $delimiter = "\r\n"): array {
         return explode($delimiter, $rawText);
     }
 
-    private function getKeyValuePairs(array $lines) {}
+    /**
+     * @param array $lines
+     * @return KeyValuePairs
+     */
+    private function getKeyValuePairs(array $lines): KeyValuePairs {
+        $pairs = new KeyValuePairs();
+        foreach ($lines as $key => $line) {
+            if ($key === 0) {
+                $ul = explode(" ", $line);
+                $pairs->create("_method", $ul[0]);
+                $pairs->create("_uri", $ul[1]);
+                $pairs->create("_httpVersion", explode('/', $ul[2])[1]);
+            } else if(strlen($line) !== 0) {
+                $ul = explode(': ', $line);
+                $pairs->create($ul[0], $ul[1]);
+            }
+        }
+        return $pairs;
+    }
 }

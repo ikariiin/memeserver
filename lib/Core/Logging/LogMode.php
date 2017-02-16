@@ -10,6 +10,6 @@ namespace memeserver\Core\Logging;
 
 
 class LogMode {
-    const LOG_DEVELOPMENT = 0;
-    const LOG_PRODUCTION = 1;
+    const LOG_DEVELOPMENT = 1;
+    const LOG_PRODUCTION = 0;
 }

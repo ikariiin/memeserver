@@ -15,10 +15,11 @@ class KeyValuePairs {
     /**
      * @param string|int $key
      * @param mixed $value
-     * @return void
+     * @return KeyValuePairs
      */
-    public function create($key, $value): void {
+    public function create($key, $value): self {
         $this->internalArray[$key] = $value;
+        return $this;
     }
 
     /**
@@ -34,5 +35,27 @@ class KeyValuePairs {
      */
     public function get($key) {
         return $this->internalArray[$key];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNull(): bool {
+        return $this->internalArray == null;
+    }
+
+    /**
+     * @param int|string $key
+     * @return bool
+     */
+    public function isSet($key): bool {
+        return isset($this->internalArray[$key]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getInternalRawArray(): array {
+        return $this->internalArray;
     }
 }

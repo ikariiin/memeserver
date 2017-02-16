@@ -48,7 +48,7 @@ class ThreadSafeStream extends \Threaded {
     public function createServer(string $connectionString) {
         $this->stream = stream_socket_server($connectionString, $errNo, $errStr);
 
-        if($errNo != 0)
+        if($errStr !== "")
             return (new BasicError($this->logger, $errNo, $errStr));
         else
             return $this;
@@ -59,7 +59,7 @@ class ThreadSafeStream extends \Threaded {
      * @return bool|self
      */
     public function accept() {
-        $acceptedStream = stream_socket_accept($this->stream);
+        $acceptedStream = @stream_socket_accept($this->stream);
         if($acceptedStream != false) {
             return (new ThreadSafeStream($this->logger))
                 ->createFromExistingStream($acceptedStream);
@@ -68,7 +68,25 @@ class ThreadSafeStream extends \Threaded {
         }
     }
 
+    /**
+     * @param int $size
+     * @return string
+     */
     public function read(int $size) {
         return fread($this->stream, $size);
+    }
+
+    /**
+     * @return resource
+     */
+    public function getRawSocket() {
+        return $this->stream;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPeerDetails(): string {
+        return stream_socket_get_name($this->stream, true);
     }
 }

@@ -28,6 +28,8 @@ class Initiator {
         $this->settings = clone $settings;
 
         $this->logger = $this->getLogger();
+
+        $this->settings->getRouter()->init($this->logger);
     }
 
     /**

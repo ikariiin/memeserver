@@ -8,6 +8,7 @@
 
 namespace memeserver\Core\Logging;
 
+use memeserver\Core\IO\Console\Color;
 use memeserver\Core\IO\Console\Console;
 
 /**
@@ -29,5 +30,11 @@ class Logger {
 
     public function exceptionHandler(\Throwable $throwable) {
         var_dump($throwable);
+    }
+
+    public function warn(int $logMode, string $warning): void {
+        if($logMode > $this->logMode || $logMode == $this->logMode) {
+            Console::out(Color::bgRed("WARNING") . ' ' . $warning);
+        }
     }
 }

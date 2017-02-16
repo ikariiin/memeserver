@@ -13,7 +13,16 @@ namespace memeserver\Core\IO\Console;
  * @package memeserver\Core\IO
  */
 class Console {
-    public static function out(string $output) {
-        print $output;
+    /**
+     * A new line
+     */
+    const NEW_LINE = PHP_EOL;
+
+    /**
+     * @param string $output
+     * @return void
+     */
+    public static function out(string $output): void {
+        print "\033[33m" . date("[ D, d M Y H:i:s ]") . "\033[0m " . $output . "\n";
     }
 }
