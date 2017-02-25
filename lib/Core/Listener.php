@@ -9,6 +9,7 @@
 namespace memeserver\Core;
 
 
+use memeserver\Core\IO\Console\Console;
 use memeserver\Core\Logging\BasicError;
 use memeserver\Core\Logging\Logger;
 use memeserver\Core\StreamSocket\ThreadSafeStream;
@@ -80,6 +81,8 @@ class Listener {
             Logger::notifyFatal();
             return false;
         } else {
+            Console::out("Listening on {$this->ip}:{$this->port}");
+
             $this->activeParentStream = $activeParentStream;
             return $activeParentStream;
         }

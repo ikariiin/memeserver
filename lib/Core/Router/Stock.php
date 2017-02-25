@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: saitama
- * Date: 10/2/17
- * Time: 5:02 PM
- */
 
 namespace memeserver\Core\Router;
 
@@ -63,7 +57,6 @@ abstract class Stock implements Router {
             }
 
             $formattedUri = $this->formatUri($annotations->get("URI"));
-            $rawUri = $annotations->get("URI");
             $regexUri = $formattedUri->getRegexUri();
 
             $this->routerStaticDetails
@@ -79,15 +72,18 @@ abstract class Stock implements Router {
     /**
      * @param string $method
      * @param string $uri
+     * @return array|false
      */
     public function route(string $method, string $uri) {
         $rawRoutes = $this->routerStaticDetails->getInternalRawArray();
 
         foreach ($rawRoutes as $regexUri => $details) {
             if((bool) preg_match($regexUri, $uri, $matches) || $uri === $regexUri) {
-                $this->dispatch($method, $details);
+                return $this->dispatch($method, $details);
             }
         }
+
+        return false;
     }
 
     /**
@@ -147,6 +143,16 @@ abstract class Stock implements Router {
         return '/' . $newRegexStr . '/';
     }
 
-    private function dispatch(string $method, KeyValuePairs $details) {
+    /**
+     * @param string $method
+     * @param KeyValuePairs $details
+     * @return array
+     */
+    private function dispatch(string $method, KeyValuePairs $details): array {
+        return [
+            "callable" => [$this, $details->get("method")],
+            "details" => $details,
+            "httpMethod" => $method
+        ];
     }
 }

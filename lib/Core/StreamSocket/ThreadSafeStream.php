@@ -89,4 +89,19 @@ class ThreadSafeStream extends \Threaded {
     public function getPeerDetails(): string {
         return stream_socket_get_name($this->stream, true);
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
+    public function write($data) {
+        return fwrite($this->stream, $data);
+    }
+
+    /**
+     * @return bool
+     */
+    public function close() {
+        return fclose($this->stream);
+    }
 }

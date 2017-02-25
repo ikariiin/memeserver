@@ -14,7 +14,9 @@ use memeserver\Core\IO\Console\Console;
 use memeserver\Core\Logging\Logger;
 use memeserver\Core\Payloads\RawPayload;
 use memeserver\Core\StreamSocket\ThreadSafeStream;
+use memeserver\Core\Threading\ConnectionSpawner;
 use memeserver\Core\Threading\Dispatcher;
+use memeserver\Core\Threading\HandlerWork;
 use memeserver\Core\Threading\ParallelOperation;
 use memeserver\Handler\Http;
 
@@ -45,12 +47,14 @@ class Watcher implements ParallelOperation {
      */
     public function __construct(Settings $settings, ThreadSafeStream $stream, Logger $logger) {
         $this->activeParentStream = $stream;
-        $this->logger = $stream;
+        $this->logger = $logger;
         $this->settings = $settings;
     }
 
     public function start(Dispatcher $dispatcher): void {
         Console::out("Started Watching on stream#" . ((int) $this->activeParentStream->getRawSocket()));
+
+        $pool = new \Pool(4, ConnectionSpawner::class);
         do {
             $client = $this->activeParentStream->accept();
 
@@ -59,12 +63,16 @@ class Watcher implements ParallelOperation {
 
             Console::out("Accepted Connection " . $client->getPeerDetails());
 
-            $http = (new Http())
+            $handler = ($this->settings->getHandler())
                 ->setRawPayload((new RawPayload($client->read(4096))))
+                ->setLogger($this->logger)
                 ->setStream($client)
                 ->setSettings($this->settings);
-            $dispatcher = new Dispatcher($http);
-            $dispatcher->start();
+
+            //$dispatcher = new Dispatcher($http);
+            //$dispatcher->start();
+
+            $pool->submit((new HandlerWork($handler)));
         } while (true);
     }
 }

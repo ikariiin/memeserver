@@ -62,6 +62,11 @@ class Settings {
     private $logToConsole;
 
     /**
+     * @var int
+     */
+    private $cookieMaxAge = 216000;
+
+    /**
      * @return string
      */
     public function getListeningIp(): string {
@@ -171,5 +176,21 @@ class Settings {
      */
     public function getRouter(): Router {
         return $this->router;
+    }
+
+    /**
+     * @param int $cookieMaxAge
+     * @return Settings
+     */
+    public function setCookieMaxAge(int $cookieMaxAge): Settings {
+        $this->cookieMaxAge = $cookieMaxAge;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCookieMaxAge(): int {
+        return $this->cookieMaxAge;
     }
 }

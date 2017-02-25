@@ -145,4 +145,15 @@ class HttpHeader {
 
         return new HttpCookies($rawPairs);
     }
+
+    /**
+     * @return string|bool
+     */
+    public function ifModified() {
+        if($this->pairs->isSet("If-None-Match")) {
+            return $this->pairs->get("If-None-Match");
+        } else {
+            return false;
+        }
+    }
 }

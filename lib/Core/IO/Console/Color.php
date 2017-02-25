@@ -35,7 +35,15 @@ class Color {
      * @param string $str
      * @return string
      */
-    public static function bgRed(string $str): string {
+    public static function bgPurple(string $str): string {
         return static::format("\033[45m", $str);
+    }
+
+    /**
+     * @param string $str
+     * @return string
+     */
+    public static function bgRed(string $str): string {
+        return static::format("\033[41m", $str);
     }
 }

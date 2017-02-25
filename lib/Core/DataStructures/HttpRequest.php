@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: saitama
- * Date: 14/2/17
- * Time: 11:06 PM
- */
 
 namespace memeserver\Core\DataStructures;
 
@@ -13,4 +7,20 @@ namespace memeserver\Core\DataStructures;
  * @package memeserver\Core\DataStructures
  */
 class HttpRequest {
+    /**
+     * @var HttpHeader
+     */
+    private $headers;
+
+    /**
+     * HttpRequest constructor.
+     * @param HttpHeader $header
+     */
+    public function __construct(HttpHeader $header) {
+        $this->headers = $header;
+    }
+
+    public function h(): HttpHeader {
+        return $this->headers;
+    }
 }

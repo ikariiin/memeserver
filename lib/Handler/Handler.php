@@ -1,13 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: saitama
- * Date: 5/2/17
- * Time: 10:27 PM
- */
 
 namespace memeserver\Handler;
 
+use memeserver\Core\Logging\Logger;
 use memeserver\Core\Payloads\RawPayload;
 use memeserver\Core\StreamSocket\ThreadSafeStream;
 
@@ -16,6 +11,11 @@ use memeserver\Core\StreamSocket\ThreadSafeStream;
  * @package memeserver\Handler
  */
 interface Handler {
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger);
+
     /**
      * @param RawPayload $payload
      */

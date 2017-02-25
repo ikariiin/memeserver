@@ -8,8 +8,6 @@
 
 namespace memeserver\Core\Threading;
 
-include_once __DIR__ . '/../../../vendor/autoload.php';
-
 
 /**
  * Class Dispatcher
@@ -34,8 +32,6 @@ class Dispatcher extends \Thread {
      * Multithreading FTW!
      */
     public function run() {
-        include_once __DIR__ . '/../../../vendor/autoload.php';
-
         $this->operation->start($this);
     }
 }

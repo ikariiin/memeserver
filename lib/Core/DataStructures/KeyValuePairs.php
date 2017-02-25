@@ -10,6 +10,9 @@ namespace memeserver\Core\DataStructures;
 
 
 class KeyValuePairs {
+    /**
+     * @var array
+     */
     private $internalArray;
 
     /**
@@ -57,5 +60,22 @@ class KeyValuePairs {
      */
     public function getInternalRawArray(): array {
         return $this->internalArray;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function inArray($value) {
+        return in_array($value, $this->internalArray);
+    }
+
+    /**
+     * @param $key int|string
+     * @return self
+     */
+    public function unset($key): self {
+        $this->unset($this->internalArray[$key]);
+        return $this;
     }
 }
