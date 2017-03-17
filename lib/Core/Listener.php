@@ -38,9 +38,9 @@ class Listener {
 
     /**
      * The parent stream
-     * @var ThreadSafeStream
+     * @var $socket
      */
-    private $activeParentStream;
+    private $socket;
 
     /**
      * @var Logger
@@ -66,33 +66,23 @@ class Listener {
     }
 
     /**
-     * @return ThreadSafeStream|bool
+     * @return \Socket
      */
     public function initListening() {
-        $activeParentStream = (new ThreadSafeStream($this->logger))
-            ->createServer(sprintf("%s://%s:%s",
-                "tcp",
-                $this->ip,
-                $this->port
-            ));
+        $socket = new \Socket(\Socket::AF_INET, \Socket::SOCK_STREAM, \Socket::SOL_TCP);
+        $socket->bind($this->ip, $this->port);
 
-        if($activeParentStream instanceof BasicError) {
-            $activeParentStream->log();
-            Logger::notifyFatal();
-            return false;
-        } else {
-            Console::out("Listening on {$this->ip}:{$this->port}");
+        Console::out("Listening on {$this->ip}:{$this->port}");
 
-            $this->activeParentStream = $activeParentStream;
-            return $activeParentStream;
-        }
+        $this->socket = $socket;
+        return $socket;
     }
 
     /**
      * Start watching
      */
     public function startWatcher() {
-        $watcher = new Watcher($this->settings, $this->activeParentStream, $this->logger);
+        $watcher = new Watcher($this->settings, $this->socket, $this->logger);
         (new Dispatcher($watcher))
             ->start();
     }

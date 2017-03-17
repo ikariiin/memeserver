@@ -4,6 +4,7 @@ namespace memeserver\Handler;
 
 use memeserver\Core\Logging\Logger;
 use memeserver\Core\Payloads\RawPayload;
+use memeserver\Core\Settings;
 use memeserver\Core\StreamSocket\ThreadSafeStream;
 
 /**
@@ -27,7 +28,12 @@ interface Handler {
     public function setCallback(callable $callback);
 
     /**
-     * @param ThreadSafeStream $stream
+     * @param \Socket $socket
      */
-    public function setStream(ThreadSafeStream $stream);
+    public function setSocket(\Socket $socket);
+
+    /**
+     * @param $settings Settings
+     */
+    public function setSettings(Settings $settings);
 }

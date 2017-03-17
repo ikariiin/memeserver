@@ -18,6 +18,7 @@ use memeserver\Core\Threading\ConnectionSpawner;
 use memeserver\Core\Threading\Dispatcher;
 use memeserver\Core\Threading\HandlerWork;
 use memeserver\Core\Threading\ParallelOperation;
+use memeserver\Handler\Handler;
 use memeserver\Handler\Http;
 
 /**
@@ -26,9 +27,9 @@ use memeserver\Handler\Http;
  */
 class Watcher implements ParallelOperation {
     /**
-     * @var ThreadSafeStream
+     * @var \Socket
      */
-    private $activeParentStream;
+    private $socket;
     /**
      * @var Logger
      */
@@ -42,37 +43,42 @@ class Watcher implements ParallelOperation {
     /**
      * Watcher constructor.
      * @param Settings $settings
-     * @param ThreadSafeStream $stream
+     * @param \Socket $socket
      * @param Logger $logger
      */
-    public function __construct(Settings $settings, ThreadSafeStream $stream, Logger $logger) {
-        $this->activeParentStream = $stream;
+    public function __construct(Settings $settings, \Socket $socket, Logger $logger) {
+        $this->socket = $socket;
         $this->logger = $logger;
         $this->settings = $settings;
     }
 
     public function start(Dispatcher $dispatcher): void {
-        Console::out("Started Watching on stream#" . ((int) $this->activeParentStream->getRawSocket()));
+        Console::out("Started Watching on stream#" . ((int) $this->socket));
 
-        $pool = new \Pool(4, ConnectionSpawner::class);
         do {
-            $client = $this->activeParentStream->accept();
+            $this->socket->listen(10);
+
+            $client = $this->socket->accept();
 
             if(!$client)
                 continue;
 
-            Console::out("Accepted Connection " . $client->getPeerDetails());
+            $peerDetails = $client->getPeerName();
 
-            $handler = ($this->settings->getHandler())
-                ->setRawPayload((new RawPayload($client->read(4096))))
-                ->setLogger($this->logger)
-                ->setStream($client)
-                ->setSettings($this->settings);
+            Console::out("Accepted Connection " . $peerDetails['host'] . '#' . $peerDetails['port']);
 
-            //$dispatcher = new Dispatcher($http);
-            //$dispatcher->start();
+            /**
+             * @var $handler Handler
+             */
+            $handler = ($this->settings->getHandler());
+            $handler->setLogger($this->logger);
+            $handler->setRawPayload((new RawPayload($client->read(16384))));
+            $handler->setCallback(function () {});
+            $handler->setSocket($client);
+            $handler->setSettings($this->settings);
 
-            $pool->submit((new HandlerWork($handler)));
+            $dispatcher = new Dispatcher($handler);
+            $dispatcher->start();
         } while (true);
     }
 }

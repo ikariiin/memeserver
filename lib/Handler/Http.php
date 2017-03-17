@@ -16,16 +16,16 @@ use memeserver\Core\Threading\Dispatcher;
 use memeserver\Core\Threading\ParallelOperation;
 use memeserver\Http\Cache;
 
-class Http implements Handler {
+class Http implements ParallelOperation, Handler {
     /**
      * @var RawPayload
      */
     private $payload;
 
     /**
-     * @var ThreadSafeStream
+     * @var \Socket
      */
-    private $stream;
+    private $socket;
 
     /**
      * @var Settings
@@ -75,29 +75,29 @@ class Http implements Handler {
 
     /**
      * @param Settings $settings
-     * @return Http
+     * @return $this
      */
-    public function setSettings(Settings $settings): self {
+    public function setSettings(Settings $settings) {
         $this->settings = $settings;
         return $this;
     }
 
     /**
-     * @param ThreadSafeStream $stream
+     * @param \Socket $socket
      * @return $this
      */
-    public function setStream(ThreadSafeStream $stream) {
-        $this->stream = $stream;
+    public function setSocket(\Socket $socket) {
+        $this->socket = $socket;
         return $this;
     }
 
     /**
      * Method to indicate the start of the process
      * in a newly created thread.
-     * @param \Threaded $threaded
+     * @param Dispatcher $dispatcher
      * @return void
      */
-    public function start(\Threaded $threaded): void {
+    public function start(Dispatcher $dispatcher): void {
         $httpParser = new HttpHeaders($this->payload);
         $headers = $httpParser->parse();
 
@@ -109,6 +109,8 @@ class Http implements Handler {
         $response = $this->buildResponse($response);
 
         $this->end($response);
+
+        $dispatcher->join();
     }
 
     /**
@@ -175,13 +177,17 @@ class Http implements Handler {
 
     /**
      * @param HttpResponse $response
-     * @return ThreadSafeStream
+     * @return \Socket
      */
     private function end(HttpResponse $response) {
         $rawResponse = $response->getRawResponse();
-        $this->stream->write($rawResponse);
-        $this->stream->close();
+        try {
+            $this->socket->write($rawResponse, strlen($rawResponse));
+        } catch (\Throwable $throwable) {
+            var_dump($throwable->getMessage(), $throwable->getTraceAsString());
+        }
+        $this->socket->close();
 
-        return $this->stream;
+        return $this->socket;
     }
 }

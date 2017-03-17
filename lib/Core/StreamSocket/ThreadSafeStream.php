@@ -16,7 +16,7 @@ class ThreadSafeStream extends \Threaded {
     /**
      * @var resource
      */
-    private $stream;
+    private $socket;
 
     /**
      * @var Logger
@@ -36,30 +36,28 @@ class ThreadSafeStream extends \Threaded {
      * @return $this
      */
     public function createFromExistingStream($stream) {
-        $this->stream = $stream;
+        $this->socket = $stream;
 
         return $this;
     }
 
     /**
-     * @param string $connectionString
-     * @return BasicError|self
+     * @param string $ip
+     * @param int $port
+     * @return ThreadSafeStream
      */
-    public function createServer(string $connectionString) {
-        $this->stream = stream_socket_server($connectionString, $errNo, $errStr);
+    public function createServer(string $ip, int $port) {
+        $this->socket = new \Socket(\Socket::AF_INET, \Socket::SOCK_STREAM, \Socket::SOL_TCP);
+        $this->socket->bind($ip, $port);
 
-        if($errStr !== "")
-            return (new BasicError($this->logger, $errNo, $errStr));
-        else
-            return $this;
-
+        return $this;
     }
 
     /**
      * @return bool|self
      */
     public function accept() {
-        $acceptedStream = @stream_socket_accept($this->stream);
+        $acceptedStream = @stream_socket_accept($this->socket);
         if($acceptedStream != false) {
             return (new ThreadSafeStream($this->logger))
                 ->createFromExistingStream($acceptedStream);
@@ -73,21 +71,21 @@ class ThreadSafeStream extends \Threaded {
      * @return string
      */
     public function read(int $size) {
-        return fread($this->stream, $size);
+        return fread($this->socket, $size);
     }
 
     /**
      * @return resource
      */
     public function getRawSocket() {
-        return $this->stream;
+        return $this->socket;
     }
 
     /**
      * @return string
      */
     public function getPeerDetails(): string {
-        return stream_socket_get_name($this->stream, true);
+        return stream_socket_get_name($this->socket, true);
     }
 
     /**
@@ -95,13 +93,13 @@ class ThreadSafeStream extends \Threaded {
      * @return int
      */
     public function write($data) {
-        return fwrite($this->stream, $data);
+        return fwrite($this->socket, $data);
     }
 
     /**
      * @return bool
      */
     public function close() {
-        return fclose($this->stream);
+        return fclose($this->socket);
     }
 }
