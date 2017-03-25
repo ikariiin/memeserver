@@ -1,14 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: saitama
- * Date: 15/2/17
- * Time: 5:39 PM
- */
 
 namespace memeserver\Core\Router;
-
-use memeserver\Core\DataStructures\KeyValuePairs;
 
 /**
  * Class RegexBasedUri

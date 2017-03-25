@@ -6,17 +6,20 @@ use memeserver\Core\DataStructures\HttpHeader;
 use memeserver\Core\DataStructures\HttpRequest;
 use memeserver\Core\DataStructures\HttpResponse;
 use memeserver\Core\DataStructures\RouteData;
+use memeserver\Core\IO\Console\Console;
 use memeserver\Core\Logging\Logger;
 use memeserver\Core\Logging\LogMode;
 use memeserver\Core\Parsers\HttpHeaders;
 use memeserver\Core\Payloads\RawPayload;
 use memeserver\Core\Settings;
-use memeserver\Core\StreamSocket\ThreadSafeStream;
 use memeserver\Core\Threading\Dispatcher;
 use memeserver\Core\Threading\ParallelOperation;
 use memeserver\Http\Cache;
+use memeserver\Http\ErrorPages\Renderer;
 
 class Http implements ParallelOperation, Handler {
+    const ERROR_PAGES_DIR = __DIR__ . '/../Http/ErrorPages';
+
     /**
      * @var RawPayload
      */
@@ -121,13 +124,13 @@ class Http implements ParallelOperation, Handler {
         $router = $this->settings->getRouter();
         $route = $router->route($headers->getHttpMethod(), $headers->getHttpUri());
 
-        if(!$route) {
-            return $this->handle404();
-        }
-
         $routeData = (new RouteData())
             ->setRequest($this->request)
             ->setResponse((new HttpResponse($this->logger, $this->request, $this->settings)));
+
+        if(!$route) {
+            return $this->handle404($routeData);
+        }
 
         $response = $route['callable']($routeData);
 
@@ -150,7 +153,7 @@ class Http implements ParallelOperation, Handler {
         if($this->cached($etag, $response)) {
             $response
                 ->setBody('')
-                ->setStatus(302)
+                ->setStatus(304)
                 ->setContentLength();
         } else {
             // Create Cache
@@ -177,17 +180,40 @@ class Http implements ParallelOperation, Handler {
 
     /**
      * @param HttpResponse $response
-     * @return \Socket
+     * @return void
      */
     private function end(HttpResponse $response) {
         $rawResponse = $response->getRawResponse();
-        try {
-            $this->socket->write($rawResponse, strlen($rawResponse));
-        } catch (\Throwable $throwable) {
-            var_dump($throwable->getMessage(), $throwable->getTraceAsString());
-        }
+
+        $this->notifyClose();
+
+        $this->socket->write($rawResponse, strlen($rawResponse));
         $this->socket->close();
 
-        return $this->socket;
+        unset($this->socket);
+    }
+
+    /**
+     * @param RouteData $routeData
+     * @return HttpResponse
+     */
+    private function handle404(RouteData $routeData): HttpResponse {
+        $content = file_get_contents(static::ERROR_PAGES_DIR . '/40_/404.html');
+        $rendered = (new Renderer(
+            $content,
+            $this->settings->getLogLevel() === LogMode::LOG_DEVELOPMENT)
+        )->getRenderedContent();
+        return $routeData->getResponse()
+            ->setBody($rendered)
+            ->setContentType('text/html')
+            ->setStatus(404);
+    }
+
+    /**
+     * Notifies connection closing
+     * @return void
+     */
+    private function notifyClose(): void {
+        Console::out('Closed Connection ' . $this->socket->getPeerName()['host'] . '#' . $this->socket->getPeerName()['port']);
     }
 }

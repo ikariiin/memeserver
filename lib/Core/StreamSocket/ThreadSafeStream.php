@@ -12,6 +12,11 @@ namespace memeserver\Core\StreamSocket;
 use memeserver\Core\Logging\BasicError;
 use memeserver\Core\Logging\Logger;
 
+/**
+ * Class ThreadSafeStream
+ * @package memeserver\Core\StreamSocket
+ * @deprecated In favour of \Socket. It currently exists, if things go awry.
+ */
 class ThreadSafeStream extends \Threaded {
     /**
      * @var resource

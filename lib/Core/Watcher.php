@@ -55,9 +55,9 @@ class Watcher implements ParallelOperation {
     public function start(Dispatcher $dispatcher): void {
         Console::out("Started Watching on stream#" . ((int) $this->socket));
 
-        do {
-            $this->socket->listen(10);
+        $this->socket->listen(20);
 
+        do {
             $client = $this->socket->accept();
 
             if(!$client)
