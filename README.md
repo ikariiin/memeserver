@@ -2,6 +2,8 @@
 
 > Docs are in midst of creation through various magical spells.
 
+> This isn't dead, trust me.
+
 A simple getting started script:
 
 ```
