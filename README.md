@@ -1,8 +1,8 @@
 # Memeserver
 
-> Docs are in midst of creation through various magical spells.
+A multi-threaded server created for simple but fast responses. Is blazingly fast and has inbuilt error handling pages for HTTP error codes.
 
-> This isn't dead, trust me.
+> Docs are in midst of creation through various magical spells.
 
 A simple getting started script:
 
